@@ -127,10 +127,10 @@
 
 
 /datum/supply_pack/rogue/armor/pants/plate
-	name = "Iron Chain Chausses"
-	cost = 25
+	name = "Steel Chain Chausses"
+	cost = 30
 	contains = list(
-					/obj/item/clothing/under/roguetown/chainlegs/iron,
+					/obj/item/clothing/under/roguetown/chainlegs,
 				)
 
 /datum/supply_pack/rogue/armor/pants/chain
