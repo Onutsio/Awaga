@@ -28,8 +28,9 @@
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	appearance_flags = NO_CLIENT_COLOR
 	var/blood_timer
+	var/mob/living/bleeder = null
 
-/obj/effect/decal/cleanable/blood/Initialize(mapload)
+/obj/effect/decal/cleanable/blood/Initialize(mapload, var/mob/living/guy)
 	. = ..()
 	GLOB.weather_act_upon_list += src
 	if(. == INITIALIZE_HINT_QDEL)
@@ -37,6 +38,8 @@
 	pixel_x = rand(-5,5)
 	pixel_y = rand(5,5)
 	blood_timer = addtimer(CALLBACK(src, PROC_REF(become_dry)), rand(5 MINUTES,8 MINUTES), TIMER_STOPPABLE)
+	if(guy)
+		bleeder = guy
 
 
 /obj/effect/decal/cleanable/blood/proc/become_dry()

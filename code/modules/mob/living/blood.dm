@@ -363,7 +363,7 @@
 		W.water_volume = 10
 		W.update_icon()
 		return
-	new /obj/effect/decal/cleanable/blood/splatter(T)
+	new /obj/effect/decal/cleanable/blood/splatter(T, src)
 	T?.pollute_turf(/datum/pollutant/metallic_scent, 30)
 
 /mob/living/proc/add_drip_floor(turf/T, amt)
@@ -395,7 +395,7 @@
 			D.drips++
 			D.update_icon()
 		else
-			new /obj/effect/decal/cleanable/blood/drip(T)
+			new /obj/effect/decal/cleanable/blood/drip(T, src)
 
 /mob/living/carbon/human/add_splatter_floor(turf/T, small_drip)
 	if(!(NOBLOOD in dna.species.species_traits))

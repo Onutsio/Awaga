@@ -423,6 +423,7 @@ Inquisitorial armory down here
 	var/cursedblood	
 	var/active
 	var/mob/living/carbon/subject
+	var/mob/living/carbon/tracking
 	var/full	
 	var/timestaken
 	var/working
@@ -470,6 +471,62 @@ Inquisitorial armory down here
 			if("onbelt")
 				return list("shrink" = 0.5,"sx" = -2,"sy" = -5,"nx" = 4,"ny" = -5,"wx" = 0,"wy" = -5,"ex" = 2,"ey" = -5,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 0,"nflip" = 0,"sflip" = 0,"wflip" = 0,"eflip" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0)
 
+/obj/item/inqarticles/indexer/attack_turf(turf/T, mob/living/user)
+	. = ..()
+	if(!HAS_TRAIT(user, TRAIT_INQUISITION))
+		return
+
+	var/list/bloodlist
+	for(var/obj/effect/decal/cleanable/blood/C in T)
+		bloodlist += C
+
+	var/obj/effect/decal/cleanable/blood/bloodrandom = pick(bloodlist)
+
+	if(bloodrandom)
+		if(!istype(bloodrandom.bleeder, /mob/living/carbon))
+			return
+		if(tracking)
+			to_chat(user, span_warning("I'm already tracking one blood sample..."))
+			return
+		
+		to_chat(user, span_warning("I start to collect [bloodrandom]..."))
+		tracking = bloodrandom.bleeder
+		var/gender = tracking.gender
+		var/race = tracking.dna.species
+		var/list/bloodtracker = tracking.get_mob_descriptors()
+		var/descriptor_height = build_coalesce_description_nofluff(bloodtracker, tracking, list(MOB_DESCRIPTOR_SLOT_HEIGHT), "%DESC1%")
+		var/descriptor_body = build_coalesce_description_nofluff(bloodtracker, tracking, list(MOB_DESCRIPTOR_SLOT_BODY), "%DESC1%")
+		var/descriptor_voice = build_coalesce_description_nofluff(bloodtracker, tracking, list(MOB_DESCRIPTOR_SLOT_VOICE), "%DESC1%")
+		var/bodytype = ""
+		if(gender == MALE)
+			bodytype = "masculine"
+		else
+			bodytype = "feminine"
+
+		desc += span_notice("<br>It contains the blood of a [bodytype], [descriptor_height] [race], with a [descriptor_body] build, and a [descriptor_voice] voice!<br>")
+
+		if(tracking.mind)
+			if(tracking.mind.has_antag_datum(/datum/antagonist/werewolf, FALSE))
+				cursedblood = 3
+			if(tracking.mind.has_antag_datum(/datum/antagonist/werewolf/lesser, FALSE))
+				cursedblood = 2
+			if(tracking.mind.has_antag_datum(/datum/antagonist/vampire, FALSE))
+				cursedblood = 2
+			if(tracking.mind.has_antag_datum(/datum/antagonist/vampire))
+				cursedblood = 3
+		if(cursedblood)
+			playsound(src, 'sound/items/indexer_cursed.ogg', 100, FALSE, 3)
+			possible_item_intents = list(/datum/intent/use)
+			user.update_a_intents()
+			active = FALSE
+			working = TRUE
+			icon_state = "indexer_cursed"
+			update_icon()
+			src.say("CURSED BLOOD!")
+			return
+		playsound(src, 'sound/items/indexer_finished.ogg', 75, FALSE, 3)
+
+
 /obj/item/inqarticles/indexer/attack_self(mob/user)
 	. = ..()
 	if(HAS_TRAIT(user, TRAIT_INQUISITION))
@@ -509,6 +566,7 @@ Inquisitorial armory down here
 	cursedblood = initial(cursedblood)
 	working = initial(working)
 	subject = initial(subject)
+	tracking = initial(tracking)
 	full = initial(full)
 	timestaken = initial(timestaken)
 	desc = initial(desc)
