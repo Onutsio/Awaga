@@ -39,26 +39,26 @@
 		to_chat(user, span_info("[I] appears to be in perfect condition."))
 		revert_cast()
 		return
+	if(do_after(user, 7 SECONDS))
+		repair_percent = initial(repair_percent)
+		int_bonus = CLAMP((user.STAINT * 0.01), 0.01, 0.9)
+		repair_percent += int_bonus
+		repair_percent *= I.max_integrity
 
-	repair_percent = initial(repair_percent)
-	int_bonus = CLAMP((user.STAINT * 0.01), 0.01, 0.9)
-	repair_percent += int_bonus
-	repair_percent *= I.max_integrity
+		I.obj_integrity = min(I.obj_integrity + repair_percent, I.max_integrity)
+		user.visible_message(span_info("[I] glows in a faint mending light."))
+		playsound(I, 'sound/foley/sewflesh.ogg', 50, TRUE, -2)
 
-	I.obj_integrity = min(I.obj_integrity + repair_percent, I.max_integrity)
-	user.visible_message(span_info("[I] glows in a faint mending light."))
-	playsound(I, 'sound/foley/sewflesh.ogg', 50, TRUE, -2)
-
-	if(I.obj_integrity >= I.max_integrity)
-		if(I.obj_broken)
-			I.obj_fix()
-		if(I.peel_count)
-			I.peel_count--
-			to_chat(user, span_info("[I]'s shorn layers mend together. ([I.peel_count])."))
-		else
-			if(I.body_parts_covered_dynamic != I.body_parts_covered)
-				I.repair_coverage()
-				to_chat(user, span_info("[I]'s shorn layers mend together, completely."))
+		if(I.obj_integrity >= I.max_integrity)
+			if(I.obj_broken)
+				I.obj_fix()
+			if(I.peel_count)
+				I.peel_count--
+				to_chat(user, span_info("[I]'s shorn layers mend together. ([I.peel_count])."))
+			else
+				if(I.body_parts_covered_dynamic != I.body_parts_covered)
+					I.repair_coverage()
+					to_chat(user, span_info("[I]'s shorn layers mend together, completely."))
 
 
 /obj/effect/proc_holder/spell/invoked/mending/lesser
